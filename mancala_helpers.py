@@ -33,10 +33,10 @@ def pad_all(nums: list) -> list:
 #AI changes: user prompt will now initialize the board.
 def initial_state(gems: int, pits: int, player: int) -> tuple:
     init = []
-    for i in range(0: (pits // 2) - 1):
+    for i in range(0, (pits // 2) + 1):
         init.append(gems)
     init.append(0) #Player 0's Mancala
-    for i in range(0:(pits // 2 - 1)):
+    for i in range((pits // 2) + 1, pits):
         init.append(gems)
     init.append(0) #Player 1's Mancala
     if pits % 2 == 1:
@@ -72,11 +72,11 @@ def valid_actions(state: tuple) -> list:
                 valid.append(i)
     elif state[0] == 1:
         if len(state[1]) % 2 == 0: #No pool
-            for i in range((len(state[1]) // 2) - 1: len(state[1]) - 1):
+            for i in range((len(state[1]) // 2) - 1, len(state[1]) - 1):
                 if state[1][i] > 0:
                     valid.append(i)
         else:
-            for i in range((len(state[1]) // 2) - 1: len(state[1]) - 2):
+            for i in range((len(state[1]) // 2) - 1, len(state[1]) - 2):
                 if state[1][i] > 0:
                     valid.append(i)
     return valid
@@ -108,17 +108,17 @@ def pits_of(player: int, board: list) -> list:
     pitList = []
     if len(board) % 2 == 0: #No pool pit
         if player == 0:
-            for i in range(0: len(board) // 2):
+            for i in range(0, len(board) // 2):
                 pitList.append(i)
         else:
-            for i in range((len(board) // 2): len(board) - 1):
+            for i in range((len(board) // 2), len(board) - 1):
                 pitList.append(i)
     else: #Pool pit present (last value in board)
         if player == 0:
-            for i in range(0: (len(board) // 2) - 1):
+            for i in range(0, (len(board) // 2) - 1):
                 pitList.append(i)
         else:
-            for i in range((len(board) // 2): len(board) - 2):
+            for i in range((len(board) // 2), len(board) - 2):
                 pitList.append(i)
     return pitList 
 
@@ -210,6 +210,7 @@ def play_turn(move: int, board: list) -> tuple:
             next = (1, board)
         string_of(board)
     else:
+        input("Press the 'Enter' button to continue: ")
         while gems_in_hand > 0:
             move += 1
             if move == (len(board) - 1) and (len(board) % 2 == 0):
@@ -230,7 +231,7 @@ def play_turn(move: int, board: list) -> tuple:
                 board[len(board) - 1] = 0
                 move = (len(board) // 2) - 1 #Set so next increment, move = len(board) // 2, would go from there
         if board[opposite_from(move)] > 0 and board[move] == 1 and ((move != len(board) - 1)):
-            board[] += board[move]
+            board[len(board)] += board[move]
             board[len(board)] += board[opposite_from(move)]
             board[move] = 0
             board[opposite_from(move)] = 0
@@ -321,62 +322,18 @@ def winner_of(board: list) -> int:
 
 #Added for human to initialize game settings
 def begin_game():
-    
-    while True:
-        try:
-            pits = int(input("Please enter the number of pits for both players (between 5 and 31): "))
-            if pits < 5 or pits > 31:
-                print("Invalid number of pits entered.")
-            else:
-                break
-        except:
-            print("Invalid")
-            continue
-
-    while True:
-        try:
-            gems = int(input("Please enter the number of gems for each pit (between 1 and half the number of pits): "))
-            if gems < 1 or gems > (pits // 2):
-                print("Invalid number of gems entered.")
-            else:
-                break
-        except:
-            print("Invalid")
-            continue
-    players = []
-    while True:
-        try:
-            play = int(input("Please enter 1 if you want to play, or 0 if you don't want to play: "))
-            if play != 1 or play != 0:
-                print("Invalid player entered.")
-            else:
-                break
-        except:
-            print("Invalid")
-            continue
-    player1 = play:
-    while True:
-        try:
-            play2 = int(input("If you want to play against a human opponent, please press 1. If you want to play against a CPU with 'Easy' difficulty. please enter 2. If you want to play against a CPU with 'Medium' difficulty. please enter 3. Or if you want to play against a CPU with 'Hard' difficulty. please enter 4."))
-            if play != 1 or play != 2 or play != 3 or play != 4:
-                print("Invalid player entered.")
-            else:
-                break
-        except:
-            print("Invalid")
-            continue
-    player2 = play2
-    while True:
-        try:
-            seq = int(input("Do you want to go first? Type 1 if yes, or 0 if no."))
-            if seq != 1 or seq != 0:
-                print("Invalid player entered.")
-            else:
-                break
-        except:
-            print("Invalid")
-            continue
-    if seq == 1:
+    setting = 0
+    while setting != 1 or setting != 2 or setting != 3 or setting != 4 or setting != 5:
+        setting = int(input("To enter the number of pits, press 1. To enter number of gems per pit, press 2. If you want a pool node, press 3. If you want to go first, press 4. If you want to go second, press 5."))
+    ai = 0
+    while ai != 1 or ai != 2 or ai != 3:
+        ai = int(input("Please enter 1 to play the baseline AI, 2 to play the tree AI, or 3 to play the tree+NN AI."))
+    if setting == 1:
+        gems = 0
+        while gems < 5 or gems > 31:
+            gems = int(input("Please enter the number of gems between 2 and 15."))
+        
+    elif setting == 2:
         players.append(player1)
         players.append(player2)
     else:
@@ -419,14 +376,14 @@ def string_of(board: list) -> str:
         elif (len(pad) - 1 - i == len(pad) - 1):
             print("Player 2's Score: ") #No pool pit (1 less)
             print(pad[len(pad) - 1])
-        print("Player 2's pits (from closest to mancala to farthest): "
-        elif (len(pad) - i > (len(pad) // 2)): #Displays all of Player 2's pits and their values
+        print("Player 2's pits (from closest to mancala to farthest): ")
+        if ((len(pad) - i) > (len(pad) // 2)): #Displays all of Player 2's pits and their values
             print(pad[len(pad) - 1 - i], end=" ")
         elif len(pad) - 1 - i == (len(pad) // 2) - 1: #Displays Player 1's score
             print("Player 1's Score: ")
             print(pad[len(pad) - 1 - i])
-        print("Player 1's pits (from closest to mancala to farthest): "
-        elif len(pad) - 1 - i < (len(pad) // 2) - 1 and (len(pad) - 1 - i) >= 0:
+        print("Player 1's pits (from closest to mancala to farthest): ")
+        if len(pad) - 1 - i < (len(pad) // 2) - 1 and (len(pad) - 1 - i) >= 0:
             print(pad[len(pad) - 1 - i], end=" ")
         
             
